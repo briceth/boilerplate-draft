@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  pgadmin:
+    image: ${PGADMIN__IMAGE_NAME}
+    container_name: ${PGADMIN__CONTAINER_NAME}
+    depends_on:
+      - postgres
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN__EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN__PASSWORD}
+      - PGADMIN_LISTEN_PORT=${PGADMIN__PORT}
+    ports:
+      - "80:80"

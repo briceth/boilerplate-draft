@@ -1,0 +1,11 @@
+{
+  "transformIgnorePatterns": ["/node_modules/"],
+  "setupFilesAfterEnv": ["./src/infra/test/setup.js"],
+  "collectCoverageFrom": ["**/*.{js}", "!**/test/**", "!**/node_modules/**"],
+  "testEnvironment": "node",
+  "transform": {
+    "^.+\\js?$": "babel-jest"
+  },
+  "verbose": true,
+  "silent": false
+}

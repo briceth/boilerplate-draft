@@ -1,0 +1,95 @@
+{
+  "name": "boilerplate",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "API boilerplate",
+  "main": "index.js",
+  "author": "Brice Tessier Huort",
+  "license": "ISC",
+  "engines": {
+    "node": ">=14.15.1"
+  },
+  "scripts": {
+    "dev": "node scripts/checkNodeVersion.js && nodemon index.js",
+    "test": "npm run db-rollback-test && npm run db-latest-test && NODE_ENV=test node --experimental-vm-modules node_modules/.bin/jest --coverage --detectOpenHandles",
+    "test:unit": "NODE_ENV=test jest --testMatch '**/?(*.)+(test).js'",
+    "test:integration": "NODE_ENV=test jest --testMatch '**/?(*.)+(spec).js'",
+    "ci:test": "npm run db-rollback-test && npm run db-latest-test && NODE_ENV=test node --experimental-vm-modules node_modules/.bin/jest --ci --collectCoverage --detectOpenHandles --forceExit",
+    "lint": "eslint --color --ext js .",
+    "format": "prettier --list-different '**/*.{js,json}'",
+    "db-latest": "knex migrate:latest --esm",
+    "db-latest-test": "NODE_ENV=test knex migrate:latest --esm",
+    "db-rollback": "knex migrate:rollback --esm",
+    "db-rollback-all": "knex migrate:rollback --all --esm",
+    "db-rollback-test": "NODE_ENV=test knex migrate:rollback --all --esm",
+    "coverage": "npm run test --coverage --reporter=html --reporter=text --reporter=lcov",
+    "fresh-install": "rm -rf node_modules && npm cache clean --force && npm install",
+    "docker:build": "docker-compose build",
+    "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
+    "docker:down": "docker-compose down --remove-orphans",
+    "docker:run": "docker-compose run --rm api",
+    "docker:test": "npm run docker:run -- npm run test",
+    "docker:exec": "docker-compose exec api",
+    "docker:db-latest": "npm run docker:exec -- npm run db-latest",
+    "docker:db-rollback": "npm run docker:exec -- npm run db-rollback",
+    "docker:db-rollback-all": "npm run docker:exec -- npm run db-rollback-all"
+  },
+  "lint-staged": {
+    "*.js": [
+      "npm run lint",
+      "npm run format"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "keywords": [
+    "boilerplate",
+    "REST api",
+    "clean architecture",
+    "postgres",
+    "knex",
+    "jest",
+    "docker",
+    "docker-compose"
+  ],
+  "dependencies": {
+    "chance": "^1.1.7",
+    "compression": "^1.7.4",
+    "connect-timeout": "^1.9.0",
+    "cors": "^2.8.5",
+    "date-fns": "^2.16.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-pino-logger": "^5.0.0",
+    "helmet": "^4.2.0",
+    "joi": "^17.3.0",
+    "knex": "^0.21.12",
+    "pg": "^8.5.1",
+    "pino": "^6.7.0",
+    "pino-pretty": "^4.3.0",
+    "swagger-jsdoc": "^5.0.1",
+    "swagger-ui-express": "^4.1.5"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^26.6.3",
+    "eslint": "^7.13.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.1.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-security": "^1.4.0",
+    "husky": "^4.3.0",
+    "jest": "^26.6.3",
+    "lint-staged": "^10.5.3",
+    "nodemon": "^2.0.6",
+    "prettier": "^2.2.0",
+    "supertest": "^6.0.1"
+  }
+}

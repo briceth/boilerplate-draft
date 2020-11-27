@@ -1,0 +1,103 @@
+version: 2
+
+jobs:
+  install:
+    docker:
+      - image: circleci/node:14.13.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependency-cache-{{ checksum "package-lock.json" }}
+            - dependency-cache-
+      - run: npm ci
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+
+  check_code:
+    docker:
+      - image: circleci/node:14.13.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependency-cache-{{ checksum "package-lock.json" }}
+            - dependency-cache-
+      - run:
+          name: lint and format
+          command: |
+            npm run lint
+            npm run format
+      - run:
+          name: audit dependencies
+          command: npm audit
+
+  test:
+    docker:
+      - image: circleci/node:14.13.0
+      - image: circleci/postgres:9.5-postgis-ram
+        environment:
+          POSTGRES_USER: bricetessierhuort
+          POSTGRES_PASSWORD: mysecretpassword
+          POSTGRES_DB: circle-ci-test
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: install knex globally
+          command: sudo npm install -g knex
+      - run:
+          name: run last migrations
+          command: sudo knex migrate:latest --env test
+      - run:
+          name: run last seed
+          command: sudo knex seed:run --env test
+      - run:
+          name: test
+          command: npm run ci:test
+      - store_artifacts:
+          path: coverage
+
+  deploy-dev:
+    docker:
+      - image: circleci/node:14.13.0
+    steps:
+      - checkout
+      - run:
+          name: Deploy develop to Heroku
+          command: |
+            git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git develop:master
+
+workflows:
+  version: 2
+  my_super_workflow:
+    jobs:
+      - install
+      - check_code:
+          requires:
+            - install
+      - test:
+          requires:
+            - install
+            - check_code
+      - deploy-dev:
+          requires:
+            - test
+          filters:
+            branches:
+              only: develop
+      - deploy-staging:
+          requires:
+            - test
+          filters:
+            branches:
+              only: release
+      - deploy-prod:
+          requires:
+            - test
+          filters:
+            branches:
+              only: main

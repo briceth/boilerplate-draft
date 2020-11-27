@@ -1,0 +1,29 @@
+{
+  "env": {
+    "node": true,
+    "es2021": true,
+    "jest": true
+  },
+  "globals": {
+    "document": false,
+    "navigator": false,
+    "window": false
+  },
+  "parser": "babel-eslint",
+  "extends": [
+    "standard",
+    "plugin:import/errors",
+    "plugin:jest/all",
+    "plugin:promise/recommended",
+    "plugin:node/recommended",
+    "plugin:security/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["security", "jest"],
+  "rules": {
+    "eqeqeq": "error",
+    "no-console": "warn",
+    "no-process-exit": "off",
+    "security/detect-object-injection": "off"
+  }
+}

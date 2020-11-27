@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  api:
+    image: ${API__IMAGE_NAME}
+    container_name: ${API__CONTAINER_NAME}
+    build: .
+    restart: always
+    volumes:
+      - /app/node_modules
+      - .:/app
+    depends_on:
+      - postgres
+    ports:
+      - "4000:4000"
+    command: npm run dev
+
+  postgres:
+    image: ${DB__IMAGE_NAME}
+    container_name: ${DB__CONTAINER_NAME}
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./postgres-initdb.sh:/docker-entrypoint-initdb.d/init-test-db.sh
+    environment:
+      POSTGRES_PASSWORD: ${DB__PASSWORD}
+      POSTGRES_USER: ${DB__USERNAME}
+      POSTGRES_DB: ${DB__NAME}
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  db-data:
